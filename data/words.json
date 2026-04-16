@@ -1,0 +1,94 @@
+{
+  "words": [
+    {
+      "id": "apple_01",
+      "word": "apple",
+      "translation": "pomme",
+      "imageUrl": "assets/images/words/apple.png",
+      "difficulty": "easy",
+      "category": "fruits",
+      "phonetic": "/ˈæpəl/"
+    },
+    {
+      "id": "banana_01",
+      "word": "banana",
+      "translation": "banane",
+      "imageUrl": "assets/images/words/banana.png",
+      "difficulty": "easy",
+      "category": "fruits",
+      "phonetic": "/bəˈnænə/"
+    },
+    {
+      "id": "cat_01",
+      "word": "cat",
+      "translation": "chat",
+      "imageUrl": "assets/images/words/cat.png",
+      "difficulty": "easy",
+      "category": "animals",
+      "phonetic": "/kæt/"
+    },
+    {
+      "id": "dog_01",
+      "word": "dog",
+      "translation": "chien",
+      "imageUrl": "assets/images/words/dog.png",
+      "difficulty": "easy",
+      "category": "animals",
+      "phonetic": "/dɔɡ/"
+    },
+    {
+      "id": "house_01",
+      "word": "house",
+      "translation": "maison",
+      "imageUrl": "assets/images/words/house.png",
+      "difficulty": "easy",
+      "category": "objects",
+      "phonetic": "/haʊs/"
+    },
+    {
+      "id": "book_01",
+      "word": "book",
+      "translation": "livre",
+      "imageUrl": "assets/images/words/book.png",
+      "difficulty": "easy",
+      "category": "objects",
+      "phonetic": "/bʊk/"
+    },
+    {
+      "id": "water_01",
+      "word": "water",
+      "translation": "eau",
+      "imageUrl": "assets/images/words/water.png",
+      "difficulty": "medium",
+      "category": "nature",
+      "phonetic": "/ˈwɔtər/"
+    },
+    {
+      "id": "tree_01",
+      "word": "tree",
+      "translation": "arbre",
+      "imageUrl": "assets/images/words/tree.png",
+      "difficulty": "easy",
+      "category": "nature",
+      "phonetic": "/triː/"
+    },
+    {
+      "id": "car_01",
+      "word": "car",
+      "translation": "voiture",
+      "imageUrl": "assets/images/words/car.png",
+      "difficulty": "easy",
+      "category": "vehicles",
+      "phonetic": "/kɑr/"
+    },
+    {
+      "id": "sun_01",
+      "word": "sun",
+      "translation": "soleil",
+      "imageUrl": "assets/images/words/sun.png",
+      "difficulty": "easy",
+      "category": "nature",
+      "phonetic": "/sʌn/"
+    }
+  ]
+}
