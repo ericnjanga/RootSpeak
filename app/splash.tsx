@@ -1,76 +1,43 @@
-import { useEffect } from 'react';
-import { StyleSheet, View, ActivityIndicator } from 'react-native';
-import { router } from 'expo-router';
+import { StyleSheet, ImageBackground } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withSequence,
-  withTiming,
-  Easing,
-} from 'react-native-reanimated';
-import { useAppState } from '@/contexts/app-state-context';
+import { ThemedView } from "@/components/themed-view";
+import ImageButton from "@/components/ui/image-button";
+import CustomButton from "@/components/ui/custom-button";
+import {router} from "expo-router";
 
-/**
- * Splashscreen
- *
- * Initial loading screen that:
- * - Shows RootSpeak logo and branding
- * - Loads initial data (words from JSON)
- * - Auto-navigates to Home screen after loading
- */
 export default function SplashScreen() {
-  const { state } = useAppState();
-  const scale = useSharedValue(1);
-
-  // Logo pulse animation
-  useEffect(() => {
-    scale.value = withRepeat(
-      withSequence(
-        withTiming(1.1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) })
-      ),
-      -1,
-      false
-    );
-  }, []);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: scale.value }],
-    };
-  });
-
-  // Auto-navigate to home when data is loaded
-  useEffect(() => {
-    if (!state.isLoading && state.sessionWords.length > 0) {
-      // Wait a bit for smooth transition
-      const timer = setTimeout(() => {
-        router.replace('/');
-      }, 1500);
-
-      return () => clearTimeout(timer);
-    }
-  }, [state.isLoading, state.sessionWords.length]);
+  const loginButton = () => {
+    router.replace('/');
+  }
 
   return (
-    <ThemedView style={styles.container}>
+    <ImageBackground
+      source={require('@/assets/images/splash-bg.png')}
+      style={styles.container}
+      resizeMode="cover"
+    >
       {/* App Name */}
-      <ThemedText style={styles.appName}>RootSpeak</ThemedText>
-      <ThemedText style={styles.tagline}>
-        Maîtrisez votre prononciation
-      </ThemedText>
-
-      {/* Loading Indicator */}
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0a7ea4" />
-        <ThemedText style={styles.loadingText}>
-          Chargement...
+      <ThemedView style={styles.contain}>
+        <ThemedText type="title" style={styles.welcome}>Bienvenue.</ThemedText>
+        <ThemedText style={styles.welcomeDesc}>
+          Commencez par créer votre compte.
         </ThemedText>
-      </View>
-    </ThemedView>
+        <ThemedView style={styles.social}>
+          <ImageButton source={require('@/assets/icons/google.png')} handlePress={() => {}}/>
+          <ImageButton source={require('@/assets/icons/apple.png')} handlePress={() => {}}/>
+          <ImageButton source={require('@/assets/icons/facebook.png')} handlePress={() => {}}/>
+        </ThemedView>
+        <ThemedView style={styles.containButton}>
+          <CustomButton
+              title="Connexion / Inscription"
+              onPress={loginButton}
+              variant="primary"
+              fullWidth={true}
+          />
+        </ThemedView>
+      </ThemedView>
+
+    </ImageBackground>
   );
 }
 
@@ -78,30 +45,39 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
+  },
+  contain: {
+    backgroundColor: '#fff',
+    width: '100%',
     padding: 20,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 8, height: -8 },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 16,
   },
-  appName: {
-    fontSize: 48,
+  welcome: {
+    fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 8,
-    padding: 12,
-    backgroundColor: '#0a7ea4',
-    borderRadius: 12,
-    color: '#FFFFFF',
-    textAlign: 'center',
+    alignSelf: 'center',
   },
-  tagline: {
-    fontSize: 18,
-    opacity: 0.7,
-    marginBottom: 48,
+  welcomeDesc: {
+    fontSize: 16,
+    alignSelf: 'center',
+    marginTop: 8,
+    color: '#747474',
   },
-  loadingContainer: {
-    alignItems: 'center',
+  social: {
+    backgroundColor: '#fff',
+    marginTop: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
     gap: 12,
   },
-  loadingText: {
-    fontSize: 16,
-    opacity: 0.7,
+  containButton: {
+    marginTop: 20,
   },
 });

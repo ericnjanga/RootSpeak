@@ -1,14 +1,10 @@
-import { useEffect } from 'react';
-import { StyleSheet, ScrollView, Pressable } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import {StyleSheet, ImageBackground} from 'react-native';
+import { useLocalSearchParams, router } from 'expo-router';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
-import { WordCard } from '@/components/learning/word-card';
-import { FeedbackDisplay } from '@/components/learning/feedback-display';
-import { StarRating } from '@/components/learning/star-rating';
-import { useAppState } from '@/contexts/app-state-context';
-import { PronunciationResult } from '@/types/api';
-import { Config } from '@/services/api';
+import ImageButton from "@/components/ui/image-button";
+import CustomButton from "@/components/ui/custom-button";
+import {HeaderSection} from "@/components/quiz/header-section";
 
 /**
  * Result Screen
@@ -23,96 +19,90 @@ import { Config } from '@/services/api';
  */
 export default function ResultScreen() {
   const params = useLocalSearchParams();
-  const { state, submitPronunciation, nextWord } = useAppState();
+  const score = parseInt(params.score as string) || 0;
+  const maxScore = parseInt(params.maxScore as string) || 3;
 
-  // Parse result from params
-  const result: PronunciationResult | null = params.result
-    ? JSON.parse(params.result as string)
-    : null;
+  // Calculer le pourcentage
+  const percentage = (score / maxScore) * 100;
 
-  const currentWord = state.currentWord;
-
-  // Calculate stars based on score
-  const calculateStars = (score: number): number => {
-    if (score >= Config.THREE_STARS_THRESHOLD) return 3;
-    if (score >= Config.TWO_STARS_THRESHOLD) return 2;
-    if (score >= Config.ONE_STAR_THRESHOLD) return 1;
-    return 0;
-  };
-
-  const stars = result ? calculateStars(result.score) : 0;
-
-  // Submit pronunciation result on mount
-  useEffect(() => {
-    if (result) {
-      submitPronunciation(result);
-      console.log('📊 Result submitted to app state');
+  // Déterminer le message selon le score
+  const getResultMessage = () => {
+    if (percentage === 100) {
+      return {
+        title: "Parfait !",
+        description: "Vous avez réussi tous les quiz avec brio !",
+      };
+    } else if (percentage >= 66) {
+      return {
+        title: "Félicitations !",
+        description: "Vous avez très bien réussi !",
+      };
+    } else if (percentage >= 33) {
+      return {
+        title: "Bien joué !",
+        description: "Vous êtes sur la bonne voie, continuez !",
+      };
+    } else {
+      return {
+        title: "Continuez vos efforts !",
+        description: "La pratique rend parfait, réessayez !",
+      };
     }
-  }, [result]);
-
-  // Handle continue button
-  const handleContinue = () => {
-    nextWord();
-    router.back();
   };
 
-  // Safety check
-  if (!result || !currentWord) {
-    return (
-      <ThemedView style={styles.container}>
-        <ThemedText>Erreur: Aucun résultat</ThemedText>
-      </ThemedView>
-    );
-  }
+  const resultMessage = getResultMessage();
+
+  const handleRestart = () => {
+    console.log('🔄 Redémarrage du jeu');
+    router.replace('/');
+  };
 
   return (
-    <ThemedView style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+      <ImageBackground
+          source={require('@/assets/images/result-bg.png')}
+          style={styles.container}
+          resizeMode="cover"
       >
-        {/* Word Card (smaller) */}
-        <WordCard
-          word={currentWord}
-          showTranslation={true}
-          imageSize="small"
-        />
+        <ThemedView style={styles.content}>
+          {/* Header en haut */}
+          <HeaderSection
+              title="Vocabulaire"
+              backgroundColor="#fff"
+              paddingHorizontal={16}
+              userImageUrl="https://www.cedricnampa.com/images/giga.png"
+              onUserPress={() => console.log('User avatar pressed')}
+          />
 
-        {/* Star Rating */}
-        <StarRating stars={stars} maxStars={3} size={56} animated={true} />
+          {/* Score view en bas */}
+          <ThemedView style={styles.contain}>
+            <ThemedText type="title" style={styles.greating}>
+              {resultMessage.title}
+            </ThemedText>
+            <ThemedText style={styles.greatingDesc}>
+              {resultMessage.description}
+            </ThemedText>
 
-        {/* Feedback Display */}
-        <FeedbackDisplay
-          rating={result.rating}
-          score={result.score}
-          feedback={result.feedback}
-          animated={true}
-        />
+            {/* Score display */}
+            <ThemedView style={styles.scoreContainer}>
+              <ThemedText style={styles.scoreText}>
+                Score: {score}/{maxScore}
+              </ThemedText>
+              <ThemedText style={styles.percentageText}>
+                {percentage.toFixed(0)}%
+              </ThemedText>
+            </ThemedView>
 
-        {/* Continue Button */}
-        <Pressable
-          style={({ pressed }) => [
-            styles.continueButton,
-            { opacity: pressed ? 0.7 : 1 },
-          ]}
-          onPress={handleContinue}
-        >
-          <ThemedText style={styles.continueButtonText}>
-            Continuer
-          </ThemedText>
-        </Pressable>
-
-        {/* Optional: Show session progress */}
-        <ThemedView style={styles.statsContainer}>
-          <ThemedText style={styles.statsText}>
-            📊 Session: {state.sessionProgress.correctWords} / {state.sessionProgress.totalWords} mots réussis
-          </ThemedText>
-          <ThemedText style={styles.statsText}>
-            ⭐ Étoiles gagnées: {state.sessionProgress.starsEarned}
-          </ThemedText>
+            <ThemedView style={styles.containButton}>
+              <CustomButton
+                  title="Recommencer le jeu"
+                  onPress={handleRestart}
+                  variant="primary"
+                  fullWidth={true}
+              />
+            </ThemedView>
+          </ThemedView>
         </ThemedView>
-      </ScrollView>
-    </ThemedView>
+      </ImageBackground>
   );
 }
 
@@ -120,40 +110,59 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  scrollContent: {
-    flexGrow: 1,
-    paddingTop: 60,
-    paddingBottom: 40,
+  content: {
+    flex: 1,
+    // paddingHorizontal: 16,
+    justifyContent: 'space-between',
+    backgroundColor: 'transparent',
+  },
+  contain: {
+    backgroundColor: '#fff',
     paddingHorizontal: 20,
-  },
-  continueButton: {
-    backgroundColor: '#0a7ea4',
-    paddingVertical: 16,
-    paddingHorizontal: 48,
-    borderRadius: 12,
-    alignSelf: 'center',
-    marginTop: 32,
+    paddingVertical: 36,
+    borderRadius: 30,
+    marginBottom: 24,
+    marginHorizontal: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOffset: { width: 8, height: -8 },
+    shadowOpacity: 0.8,
     shadowRadius: 8,
-    elevation: 6,
+    elevation: 16,
   },
-  continueButtonText: {
-    color: '#FFFFFF',
-    fontSize: 20,
+  greating: {
+    fontSize: 24,
     fontWeight: 'bold',
+    alignSelf: 'center',
   },
-  statsContainer: {
-    marginTop: 32,
-    padding: 16,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 12,
+  greatingDesc: {
+    fontSize: 16,
+    alignSelf: 'center',
+    marginTop: 4,
+  },
+  scoreContainer: {
+    backgroundColor: 'transparent',
+    marginTop: 24,
     alignItems: 'center',
     gap: 8,
   },
-  statsText: {
-    fontSize: 14,
-    opacity: 0.8,
+  scoreText: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#0A5DFE',
+  },
+  percentageText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#666',
+  },
+  social: {
+    backgroundColor: '#fff',
+    marginTop: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  containButton: {
+    marginTop: 32,
   },
 });
